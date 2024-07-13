@@ -220,27 +220,36 @@ public class IOCaseTest {
     }
 
     @Test
-    public void test_checkRegionMatches_functionality() {
+    public void test_checkRegionMatches_Sensitive_EmptyString() {
         assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, ""));
+        assertTrue(IOCase.SENSITIVE.checkRegionMatches("", 0, ""));
+        assertFalse(IOCase.SENSITIVE.checkRegionMatches("", 1, ""));
+    }
+
+    @Test
+    public void test_checkRegionMatches_Sensitive_FullMatches() {
         assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "A"));
         assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "AB"));
         assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "ABC"));
+        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "BC"));
+    }
+
+    @Test
+    public void test_checkRegionMatches_Sensitive_PartialMatches() {
         assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "BC"));
         assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "C"));
         assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, "ABCD"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("", 0, "ABC"));
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("", 0, ""));
-
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, ""));
         assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "A"));
         assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "AB"));
         assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "ABC"));
-        assertTrue(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "BC"));
         assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "C"));
         assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 1, "ABCD"));
+        assertFalse(IOCase.SENSITIVE.checkRegionMatches("", 0, "ABC"));
         assertFalse(IOCase.SENSITIVE.checkRegionMatches("", 1, "ABC"));
-        assertFalse(IOCase.SENSITIVE.checkRegionMatches("", 1, ""));
+    }
 
+    @Test
+    public void test_checkRegionMatches_Sensitive_NullValues() {
         assertFalse(IOCase.SENSITIVE.checkRegionMatches("ABC", 0, null));
         assertFalse(IOCase.SENSITIVE.checkRegionMatches(null, 0, "ABC"));
         assertFalse(IOCase.SENSITIVE.checkRegionMatches(null, 0, null));
@@ -248,6 +257,7 @@ public class IOCaseTest {
         assertFalse(IOCase.SENSITIVE.checkRegionMatches(null, 1, "ABC"));
         assertFalse(IOCase.SENSITIVE.checkRegionMatches(null, 1, null));
     }
+
 
     @Test
     public void test_checkStartsWith_case() {
