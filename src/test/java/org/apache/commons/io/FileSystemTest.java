@@ -52,16 +52,36 @@ public class FileSystemTest {
     @Test
     public void testIsLegalName() {
         for (final FileSystem fs : FileSystem.values()) {
-            assertFalse(fs.isLegalFileName(""), fs.name()); // Empty is always illegal
-            assertFalse(fs.isLegalFileName(null), fs.name()); // null is always illegal
-            assertFalse(fs.isLegalFileName("\0"), fs.name()); // Assume NUL is always illegal
-            assertTrue(fs.isLegalFileName("0"), fs.name()); // Assume simple name always legal
-            for (final String candidate : fs.getReservedFileNames()) {
-                // Reserved file names are not legal
-                assertFalse(fs.isLegalFileName(candidate));
-            }
+            testEmptyNameIsIllegal(fs);
+            testNullNameIsIllegal(fs);
+            testNulCharIsIllegal(fs);
+            testSimpleNameIsLegal(fs);
+            testReservedNamesAreIllegal(fs);
         }
     }
+
+    private void testEmptyNameIsIllegal(FileSystem fs) {
+        assertFalse(fs.isLegalFileName(""), fs.name());
+    }
+
+    private void testNullNameIsIllegal(FileSystem fs) {
+        assertFalse(fs.isLegalFileName(null), fs.name());
+    }
+
+    private void testNulCharIsIllegal(FileSystem fs) {
+        assertFalse(fs.isLegalFileName("\0"), fs.name());
+    }
+
+    private void testSimpleNameIsLegal(FileSystem fs) {
+        assertTrue(fs.isLegalFileName("0"), fs.name());
+    }
+
+    private void testReservedNamesAreIllegal(FileSystem fs) {
+        for (final String candidate : fs.getReservedFileNames()) {
+            assertFalse(fs.isLegalFileName(candidate));
+        }
+    }
+
 
     @Test
     public void testIsReservedFileName() {
@@ -133,21 +153,30 @@ public class FileSystemTest {
     public void testToLegalFileNameWindows() {
         final FileSystem fs = FileSystem.WINDOWS;
         final char replacement = '-';
+        testIllegalCharactersAreReplaced(fs, replacement);
+        testAllowedCharactersAreUnchanged(fs, replacement);
+    }
+
+    private void testIllegalCharactersAreReplaced(FileSystem fs, char replacement) {
         for (char i = 0; i < 32; i++) {
             assertEquals(replacement, fs.toLegalFileName(String.valueOf(i), replacement).charAt(0));
         }
         final char[] illegal = { '<', '>', ':', '"', '/', '\\', '|', '?', '*' };
-        for (char i = 0; i < illegal.length; i++) {
-            assertEquals(replacement, fs.toLegalFileName(String.valueOf(i), replacement).charAt(0));
-        }
-        for (char i = 'a'; i < 'z'; i++) {
-            assertEquals(i, fs.toLegalFileName(String.valueOf(i), replacement).charAt(0));
-        }
-        for (char i = 'A'; i < 'Z'; i++) {
-            assertEquals(i, fs.toLegalFileName(String.valueOf(i), replacement).charAt(0));
-        }
-        for (char i = '0'; i < '9'; i++) {
-            assertEquals(i, fs.toLegalFileName(String.valueOf(i), replacement).charAt(0));
+        for (char c : illegal) {
+            assertEquals(replacement, fs.toLegalFileName(String.valueOf(c), replacement).charAt(0));
         }
     }
+
+    private void testAllowedCharactersAreUnchanged(FileSystem fs, char replacement) {
+        for (char c = 'a'; c <= 'z'; c++) {
+            assertEquals(c, fs.toLegalFileName(String.valueOf(c), replacement).charAt(0));
+        }
+        for (char c = 'A'; c <= 'Z'; c++) {
+            assertEquals(c, fs.toLegalFileName(String.valueOf(c), replacement).charAt(0));
+        }
+        for (char c = '0'; c <= '9'; c++) {
+            assertEquals(c, fs.toLegalFileName(String.valueOf(c), replacement).charAt(0));
+        }
+    }
+
 }
