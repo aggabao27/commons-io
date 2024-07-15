@@ -63,37 +63,35 @@ public class FileUtilsListFilesTest {
         return fileNames;
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @BeforeEach
     public void setUp() throws Exception {
-        File dir = temporaryFolder;
-        File file = new File(dir, "dummy-build.xml");
-        FileUtils.touch(file);
-        file = new File(dir, "README");
-        FileUtils.touch(file);
+        createFile(temporaryFolder, "dummy-build.xml");
+        createFile(temporaryFolder, "README");
 
-        dir = new File(dir, "subdir1");
-        dir.mkdirs();
-        file = new File(dir, "dummy-build.xml");
-        FileUtils.touch(file);
-        file = new File(dir, "dummy-readme.txt");
-        FileUtils.touch(file);
+        File subDir1 = createDirectory(temporaryFolder, "subdir1");
+        createFile(subDir1, "dummy-build.xml");
+        createFile(subDir1, "dummy-readme.txt");
 
-        dir = new File(dir, "subsubdir1");
-        dir.mkdirs();
-        file = new File(dir, "dummy-file.txt");
-        FileUtils.touch(file);
-        file = new File(dir, "dummy-index.html");
-        FileUtils.touch(file);
+        File subSubDir1 = createDirectory(subDir1, "subsubdir1");
+        createFile(subSubDir1, "dummy-file.txt");
+        createFile(subSubDir1, "dummy-index.html");
 
-        dir = dir.getParentFile();
-        dir = new File(dir, "CVS");
-        dir.mkdirs();
-        file = new File(dir, "Entries");
-        FileUtils.touch(file);
-        file = new File(dir, "Repository");
+        File cvsDir = createDirectory(subDir1.getParentFile(), "CVS");
+        createFile(cvsDir, "Entries");
+        createFile(cvsDir, "Repository");
+    }
+
+    private void createFile(File parentDir, String fileName) throws IOException {
+        File file = new File(parentDir, fileName);
         FileUtils.touch(file);
     }
+
+    private File createDirectory(File parentDir, String dirName) {
+        File dir = new File(parentDir, dirName);
+        dir.mkdirs();
+        return dir;
+    }
+
 
     @Test
     public void testIterateFilesByExtension() {
